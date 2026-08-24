@@ -8,8 +8,16 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  // J'utilise deux URLs différentes parce que je connecte ma base à
+  // Supabase : "url" passe par le pooler de connexions (pgbouncer),
+  // utilisé par mon serveur pour ses requêtes courantes. "directUrl"
+  // est une connexion directe à Postgres, nécessaire uniquement pour
+  // que Prisma puisse exécuter mes migrations (le pooler ne le
+  // permet pas). En local avec un Postgres classique, je peux mettre
+  // exactement la même valeur dans les deux variables.
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ============================================================

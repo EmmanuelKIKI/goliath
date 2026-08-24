@@ -43,7 +43,7 @@ cp .env.example .env
 ```
 
 Puis j'ouvre `.env` et je remplis mes vraies valeurs, en particulier :
-- `DATABASE_URL` avec mes identifiants PostgreSQL
+- `DATABASE_URL` et `DIRECT_URL` avec mes identifiants PostgreSQL (en local avec un Postgres classique, je peux mettre la même valeur dans les deux)
 - `JWT_SECRET` avec une longue chaîne aléatoire (je peux en générer une avec `openssl rand -hex 32`)
 
 ### 4. Créer les tables dans ma base de données
@@ -62,13 +62,13 @@ J'ai deux façons de faire, au choix :
 ```bash
 npm run prisma:seed
 ```
-Ça crée un compte avec l'email `dotomikiki@gmail.com et le mot de passe temporaire `ChangeMoiRapidement123`. Je pense à le changer rapidement.
+Ça crée un compte avec l'email `jean@goliath.local` et le mot de passe temporaire `ChangeMoiRapidement123`. Je pense à le changer rapidement.
 
 **Option B — avec la route d'inscription**, une fois mon serveur lancé :
 ```bash
 curl -X POST http://localhost:4000/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"nom":"Jean Kiki","email":"dotomikiki@gmail.com","motDePasse":"MonMotDePasseSecurise123"}'
+  -d '{"nom":"Jean Kiki","email":"jean@example.com","motDePasse":"MonMotDePasseSecurise123"}'
 ```
 
 Je ne peux créer qu'un seul compte : la route bloque volontairement toute inscription supplémentaire, puisque je suis seul à utiliser la plateforme pour l'instant.
@@ -87,7 +87,61 @@ npm start
 
 Mon API tourne alors sur `http://localhost:4000` (ou le port que j'ai défini dans `.env`).
 
-## Structure de mes dossiers
+## Déployer en production (Render + Supabase)
+
+C'est comme ça que je fais tourner GOLIATH en vrai, accessible depuis mon téléphone n'importe où, pas seulement en local.
+
+### 1. Créer ma base de données sur Supabase
+
+1. Je crée un compte sur [supabase.com](https://supabase.com) et un nouveau projet
+2. Je vais dans **Project Settings > Database > Connection string**
+3. Je récupère deux URLs différentes :
+   - La connexion **"Transaction pooler"** (port 6543) → pour `DATABASE_URL`
+   - La connexion **directe** (port 5432) → pour `DIRECT_URL`
+
+Je garde ces deux URLs de côté, je les colle bientôt dans Render. J'ai besoin des deux parce que Prisma ne peut pas exécuter mes migrations à travers le pooler de connexions : `DIRECT_URL` sert uniquement à ça.
+
+### 2. Pousser mon code sur GitHub
+
+Je crée un repo GitHub (public ou privé) et j'y pousse le contenu de ce dossier `backend/`.
+
+### 3. Déployer sur Render
+
+**Option A — avec le Blueprint (le plus rapide) :**
+1. Sur [render.com](https://render.com), je clique sur **New +** puis **Blueprint**
+2. Je connecte mon repo GitHub, Render détecte automatiquement mon fichier `render.yaml`
+3. Render me demande de remplir les variables marquées comme secrètes : `DATABASE_URL`, `DIRECT_URL`, `FRONTEND_URL`
+
+**Option B — manuellement :**
+1. Sur Render, je clique sur **New +** puis **Web Service**
+2. Je connecte mon repo GitHub
+3. Je configure :
+   - **Build Command** : `npm install && npx prisma generate`
+   - **Start Command** : `npx prisma migrate deploy && npm start`
+   - **Environment** : Node
+4. Dans l'onglet **Environment**, j'ajoute mes variables : `DATABASE_URL`, `DIRECT_URL`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `FRONTEND_URL`, `NODE_ENV=production`
+
+Je n'ai rien à configurer pour `PORT` : Render l'injecte automatiquement, et mon code le lit déjà via `process.env.PORT`.
+
+### 4. Créer mon compte utilisateur en production
+
+Une fois mon service démarré sur Render, je crée mon compte via la route d'inscription, en remplaçant l'URL par celle de mon service Render :
+
+```bash
+curl -X POST https://mon-service.onrender.com/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"nom":"Jean Kiki","email":"jean@example.com","motDePasse":"MonMotDePasseSecurise123"}'
+```
+
+### 5. Brancher mon frontend dessus
+
+Dans le `.env` de mon frontend, je remplace `VITE_API_URL` par l'URL de mon service Render (`https://mon-service.onrender.com`), puis je rebuild.
+
+### À savoir sur le plan gratuit de Render
+
+Un service web gratuit sur Render se met en veille après un moment d'inactivité, et met quelques secondes à se "réveiller" au prochain appel. C'est sans impact sur mes données, juste un petit délai sur la toute première requête après une pause. Si ça me gêne au quotidien, je peux passer sur un plan payant qui reste toujours actif.
+
+
 
 ```
 backend/
@@ -102,6 +156,7 @@ backend/
 │   ├── schema.prisma      # Le schéma complet de ma base de données
 │   └── seed.js             # Script pour créer mon compte initial
 ├── .env.example
+├── render.yaml           # Configuration de déploiement automatique sur Render
 └── package.json
 ```
 
