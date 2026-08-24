@@ -1,0 +1,52 @@
+/* J'importe mes trois polices depuis Google Fonts : Space Grotesk pour
+   mes titres, Inter pour le texte courant, IBM Plex Mono pour mes
+   chiffres. Je les charge en amont pour éviter un effet de saut de
+   texte au chargement. */
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-sable text-pintade;
+  }
+  body {
+    @apply font-sans antialiased;
+  }
+  h1, h2, h3 {
+    @apply font-display text-pintade;
+  }
+  /* Je garde un focus clavier bien visible partout : je veux que mon
+     app reste utilisable proprement même sans souris/tactile. */
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid theme("colors.indigo.DEFAULT");
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Ma signature visuelle : une fine bande "plumage", inspirée des
+     rayures du plumage du poulet Goliath et de la pintade. Je ne
+     l'utilise qu'une seule fois, en haut de l'app, pour ne pas la
+     banaliser. */
+  .bande-plumage {
+    height: 6px;
+    background: repeating-linear-gradient(
+      90deg,
+      theme("colors.pintade.DEFAULT") 0px,
+      theme("colors.pintade.DEFAULT") 18px,
+      theme("colors.mais.DEFAULT") 18px,
+      theme("colors.mais.DEFAULT") 30px,
+      theme("colors.indigo.DEFAULT") 30px,
+      theme("colors.indigo.DEFAULT") 42px
+    );
+  }
+
+  /* Chiffres tabulaires : je m'en sers pour tous mes montants et
+     quantités, pour que mes colonnes s'alignent bien. */
+  .chiffre {
+    @apply font-mono tabular-nums;
+  }
+}

@@ -1,0 +1,16 @@
+# Je n'envoie jamais mes dépendances ni mes fichiers générés sur Git
+node_modules/
+dist/
+dist-ssr/
+.env
+.env.local
+
+# Fichiers générés automatiquement par le plugin PWA
+dev-dist/
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
