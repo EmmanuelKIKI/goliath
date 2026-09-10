@@ -7,23 +7,19 @@ import { ChevronRight } from "lucide-react";
 import AppShell from "../components/AppShell";
 import Card from "../components/Card";
 import { useAuth } from "../context/AuthContext";
-import { formaterDate } from "../lib/format";
 
 export default function ParametresPage() {
-  const { utilisateur } = useAuth();
+  const { nom } = useAuth();
 
   return (
     <AppShell titre="Mes paramètres">
       <div className="flex flex-col gap-4">
         <Card>
-          <p className="font-display font-semibold mb-2">Mon compte</p>
-          <p className="text-sm">{utilisateur?.nom}</p>
-          <p className="text-sm text-pintade-light">{utilisateur?.email}</p>
-          {utilisateur?.dateCreation && (
-            <p className="text-xs text-pintade-light mt-1">
-              Compte créé le {formaterDate(utilisateur.dateCreation)}
-            </p>
-          )}
+          <p className="font-display font-semibold mb-2">Connecté en tant que</p>
+          <p className="text-sm">{nom}</p>
+          <p className="text-xs text-pintade-light mt-1">
+            Je suis seul à avoir le lien de cette application — pas d'email, pas de mot de passe, juste mon nom.
+          </p>
         </Card>
 
         <Link to="/clients-ventes">

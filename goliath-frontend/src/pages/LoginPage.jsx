@@ -1,7 +1,7 @@
-// Ma page de connexion. Comme je suis seul utilisateur de la
-// plateforme, je n'ai pas de lien "créer un compte" ici : mon compte
-// initial se crée via le script de seed ou la route /auth/register,
-// une seule fois, côté backend.
+// Ma page de connexion, réduite à l'essentiel : je suis seul à avoir
+// le lien de cette application, donc je n'ai besoin ni d'un email ni
+// d'un mot de passe. Je tape juste mon nom, et si ça correspond à ce
+// que j'ai configuré côté serveur (ACCES_NOM), je suis connecté.
 
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
@@ -11,13 +11,12 @@ import Button from "../components/Button";
 import { Champ, ChampTexte } from "../components/Champs";
 
 export default function LoginPage() {
-  const { connexion, utilisateur, chargementInitial } = useAuth();
-  const [email, setEmail] = useState("");
-  const [motDePasse, setMotDePasse] = useState("");
+  const { connexion, nom: nomConnecte, chargementInitial } = useAuth();
+  const [nom, setNom] = useState("");
   const [erreur, setErreur] = useState(null);
   const [envoiEnCours, setEnvoiEnCours] = useState(false);
 
-  if (!chargementInitial && utilisateur) {
+  if (!chargementInitial && nomConnecte) {
     return <Navigate to="/" replace />;
   }
 
@@ -26,7 +25,7 @@ export default function LoginPage() {
     setErreur(null);
     setEnvoiEnCours(true);
     try {
-      await connexion(email, motDePasse);
+      await connexion(nom);
     } catch (e) {
       setErreur(extraireMessageErreur(e));
     } finally {
@@ -39,30 +38,21 @@ export default function LoginPage() {
       <div className="bande-plumage" aria-hidden="true" />
       <div className="flex-1 flex flex-col justify-center px-6 py-10 max-w-sm mx-auto w-full">
         <p className="text-xs uppercase tracking-widest text-mais-dark font-semibold mb-1">GOLIATH</p>
-        <h1 className="font-display text-3xl font-semibold text-pintade mb-1">Je me connecte</h1>
+        <h1 className="font-display text-3xl font-semibold text-pintade mb-1">C'est moi</h1>
         <p className="text-sm text-pintade-light mb-8">
-          Ma plateforme de gestion d'élevage, tout en un.
+          Je tape mon nom pour retrouver mon élevage.
         </p>
 
         <form onSubmit={gererEnvoi}>
-          <Champ label="Email" obligatoire>
+          <Champ label="Mon nom" obligatoire>
             <ChampTexte
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="jean@goliath.local"
+              type="text"
+              value={nom}
+              onChange={(e) => setNom(e.target.value)}
+              placeholder="Mon prénom ou mon nom"
               required
               autoFocus
-            />
-          </Champ>
-
-          <Champ label="Mot de passe" obligatoire>
-            <ChampTexte
-              type="password"
-              value={motDePasse}
-              onChange={(e) => setMotDePasse(e.target.value)}
-              placeholder="••••••••"
-              required
+              autoComplete="off"
             />
           </Champ>
 
@@ -71,7 +61,7 @@ export default function LoginPage() {
           )}
 
           <Button type="submit" className="w-full" disabled={envoiEnCours}>
-            {envoiEnCours ? "Connexion..." : "Me connecter"}
+            {envoiEnCours ? "Connexion..." : "Entrer"}
           </Button>
         </form>
       </div>

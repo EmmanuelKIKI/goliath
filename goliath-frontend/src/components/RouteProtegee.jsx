@@ -8,13 +8,13 @@ import { useAuth } from "../context/AuthContext";
 import Spinner from "./Spinner";
 
 export default function RouteProtegee({ children }) {
-  const { utilisateur, chargementInitial } = useAuth();
+  const { nom, chargementInitial } = useAuth();
 
   if (chargementInitial) {
     return <Spinner className="min-h-screen" />;
   }
 
-  if (!utilisateur) {
+  if (!nom) {
     return <Navigate to="/connexion" replace />;
   }
 

@@ -10,7 +10,7 @@ import BottomNav from "./BottomNav";
 import { useAuth } from "../context/AuthContext";
 
 export default function AppShell({ titre, actions, children }) {
-  const { utilisateur, deconnexion } = useAuth();
+  const { nom, deconnexion } = useAuth();
 
   return (
     <div className="min-h-screen flex flex-col pb-20">
@@ -29,7 +29,7 @@ export default function AppShell({ titre, actions, children }) {
           <Link to="/parametres" className="text-pintade-light hover:text-pintade" title="Mes paramètres" aria-label="Mes paramètres">
             <Settings size={20} strokeWidth={2} />
           </Link>
-          {utilisateur && (
+          {nom && (
             <button
               onClick={deconnexion}
               className="text-xs text-pintade-light hover:text-rouille px-2 py-1"

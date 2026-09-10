@@ -26,7 +26,7 @@ api.interceptors.response.use(
   (erreur) => {
     if (erreur.response?.status === 401) {
       localStorage.removeItem("goliath_token");
-      localStorage.removeItem("goliath_utilisateur");
+      localStorage.removeItem("goliath_nom");
       if (window.location.pathname !== "/connexion") {
         window.location.href = "/connexion";
       }

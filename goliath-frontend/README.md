@@ -59,7 +59,7 @@ Mon app est alors accessible sur `http://localhost:5173`.
 
 ### 5. Me connecter
 
-Je me connecte avec le compte que j'ai créé côté backend (via le script de seed ou la route d'inscription). Cette version est prévue pour un seul utilisateur : moi.
+Je me connecte en tapant simplement le nom que j'ai défini dans `ACCES_NOM` côté backend. Pas d'email, pas de mot de passe : je suis seul à avoir le lien de cette application.
 
 ## Build de production
 
