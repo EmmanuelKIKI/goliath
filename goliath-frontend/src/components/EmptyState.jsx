@@ -1,12 +1,12 @@
-// Plutôt que de laisser une liste vide sans explication, j'affiche ici
-// un message clair sur ce qu'il n'y a pas encore, et une action pour
-// combler ce vide directement.
+// src/components/EmptyState.jsx
+// Un écran vide est une invitation à agir, pas juste un constat.
 
-export default function EmptyState({ titre, description, action }) {
+export default function EmptyState({ icon: Icon, title, description, action }) {
   return (
-    <div className="text-center py-12 px-4">
-      <p className="font-display text-lg text-pintade mb-1">{titre}</p>
-      {description && <p className="text-sm text-pintade-light mb-4">{description}</p>}
+    <div className="flex flex-col items-center justify-center gap-2 rounded-md border border-dashed border-black/10 bg-white px-6 py-12 text-center">
+      {Icon && <Icon size={28} className="text-muted" />}
+      <p className="font-medium text-ink">{title}</p>
+      {description && <p className="text-sm text-muted max-w-xs">{description}</p>}
       {action}
     </div>
   );

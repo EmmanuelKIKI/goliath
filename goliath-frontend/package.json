@@ -1,7 +1,6 @@
 {
   "name": "goliath-frontend",
   "version": "1.0.0",
-  "description": "Ma PWA pour gérer mon élevage de poulets Goliath depuis mon téléphone ou mon ordinateur.",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,19 +9,19 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "axios": "^1.7.7",
-    "lucide-react": "^0.446.0",
+    "@supabase/supabase-js": "^2.45.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.2",
-    "recharts": "^2.12.7"
+    "react-router-dom": "^6.26.0",
+    "lucide-react": "^0.383.0",
+    "recharts": "^2.12.7",
+    "idb": "^8.0.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.13",
-    "vite": "^5.4.8",
-    "vite-plugin-pwa": "^0.20.5"
+    "vite": "^5.4.6"
   }
 }
