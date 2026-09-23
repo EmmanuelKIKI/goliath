@@ -25,6 +25,7 @@ de valeurs déjà calculées côté serveur.
 goliath-frontend/
 ├── public/
 │   ├── manifest.json
+│   ├── service-worker.js
 │   └── icons/
 ├── src/
 │   ├── components/       (Toast, ConfirmDialog, OfflineBanner, KpiCard, AlertBanner, EmptyState, LoadingState, FormField, DynamicList)
@@ -44,13 +45,19 @@ goliath-frontend/
 │   ├── styles/index.css
 │   ├── App.jsx
 │   └── main.jsx
-├── service-worker.js
+├── vercel.json
 ├── package.json
 ├── vite.config.js
 ├── tailwind.config.js
 ├── .env.example
 └── README.md
 ```
+
+**Écart assumé n°4** : le prompt plaçait `service-worker.js` à la racine du
+projet. Vite ne copie dans `dist/` que ce qui se trouve dans `public/` — un
+fichier à la racine du projet n'est jamais servi en production. Je l'ai
+donc déplacé dans `public/service-worker.js` ; `main.jsx` continue de
+l'enregistrer avec le chemin `/service-worker.js`, qui reste correct.
 
 ## 3. Règle d'architecture
 
@@ -115,7 +122,37 @@ L'historique IA lit directement `ai_analyses` (pas d'Edge Function).
   backend livré ; la comparaison aux seuils a donc lieu dans
   `src/pages/Dashboard.jsx`, pas dans une fonction SQL.
 
-## 8. Installation et commandes (Windows / PowerShell)
+## 8. Checklist de déploiement (Vercel + Supabase)
+
+Le code n'a besoin d'aucune autre modification que celle listée au point 7
+(déjà faite dans ce zip). Ce qui reste est de la configuration, pas du code :
+
+**Côté Supabase (une fois)**
+1. `supabase db push` — applique les 5 migrations du backend.
+2. `supabase functions deploy` pour les 4 Edge Functions.
+3. `supabase secrets set ...` — tous les secrets serveur (jamais dans le frontend).
+4. Lancer `supabase/seed/create-app-user.ts` pour créer l'utilisateur unique.
+5. Rien à changer dans `supabase/config.toml` (`site_url`) : je n'utilise ni
+   lien magique ni redirection OAuth — `auth-login` renvoie les jetons
+   directement, donc cette valeur ne sert pas en production ici.
+
+**Côté Vercel (une fois)**
+1. Importer le repo, framework détecté automatiquement : **Vite**.
+2. Build command `npm run build`, output directory `dist` (valeurs par
+   défaut du preset Vite — rien à changer).
+3. Ajouter les variables d'environnement `VITE_SUPABASE_URL` et
+   `VITE_SUPABASE_ANON_KEY` (Project Settings → Environment Variables),
+   valables pour Production, Preview et Development.
+4. `vercel.json` (ajouté dans ce zip) fait deux choses : il réécrit toutes
+   les routes vers `index.html` pour que React Router fonctionne après un
+   rafraîchissement de page (ex. `/statistiques`), et il empêche la mise en
+   cache agressive de `service-worker.js` pour que mes mises à jour
+   arrivent bien aux utilisateurs.
+5. Rien à faire côté CORS : `_shared/cors.ts` autorise déjà `*` sur les
+   Edge Functions, donc n'importe quel domaine Vercel (production ou
+   preview) fonctionne sans configuration supplémentaire.
+
+## 9. Installation et commandes (Windows / PowerShell)
 
 ```powershell
 # Installer les dépendances
@@ -141,14 +178,14 @@ vercel env add VITE_SUPABASE_ANON_KEY
 vercel --prod
 ```
 
-## 9. Ce que je n'ai pas construit (volontairement)
+## 10. Ce que je n'ai pas construit (volontairement)
 
 Marketplace, paiement, abonnement, publicité, réseau social, chat entre
 utilisateurs, système d'employés ou rôles complexes, IA présentée comme un
 médecin/vétérinaire, Edge Function pour du simple CRUD, parcours à dix
 écrans pour enregistrer une simple mortalité.
 
-## 10. Priorité si un choix s'impose
+## 11. Priorité si un choix s'impose
 
 Données → fonctionnement offline → synchronisation → sécurité → IA →
 statistiques → exports.

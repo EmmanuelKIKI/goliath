@@ -1,0 +1,11 @@
+{
+  "rewrites": [
+    { "source": "/((?!icons/|manifest.json|service-worker.js|assets/).*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/service-worker.js",
+      "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+    }
+  ]
+}
